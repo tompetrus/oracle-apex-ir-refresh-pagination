@@ -2,10 +2,18 @@
   var C_PAGINATION_LABEL = ".a-IRR-pagination-label"
     , C_MAX_ROWS         = 1
     , C_ROWS_FETCHED     = 1;
+    
+  /** @purpose is there a pagination link currently on the page
+    * @param uiw the widget instance
+    */
+  function hasPagination( uiw ) {
+    return !!$(C_PAGINATION_LABEL, uiw.element).length;
+  }
+    
   /** @purpose retrieve the current min row of an IR by parsing the pagination label of an "X - Y" or X - Y of Z" scheme.
     * @param uiw the widget instance
     */
-  function getCurrentRow (uiw) {
+  function getCurrentRow ( uiw ) {
     var currentText = $(C_PAGINATION_LABEL, uiw.element).text()
       , currentMinRow = currentText.substring(0, currentText.indexOf("-")).trim();
     return currentMinRow;
@@ -17,7 +25,7 @@
     * @param pRowsFetched irrelevant - this is not used by apex
     */
   function constructPaginationString ( pMinRow, pMaxRows, pRowsFetched ) {
-    return "pgR_min_row="+pMinRow+"max_rows="+pMaxRows+"rows_fetched="+pRowsFetched;
+    return "pgR_min_row="+(pMinRow?pMinRow:1)+"max_rows="+pMaxRows+"rows_fetched="+pRowsFetched;
   };      
   
   $.widget("apex.interactiveReport", $.apex.interactiveReport, {
@@ -26,7 +34,7 @@
       */
     refresh: function ( pMaintainPagination ) {
       var uiw = this;
-      if ( pMaintainPagination ) {
+      if ( pMaintainPagination && hasPagination(uiw) ) {
         uiw._paginate(constructPaginationString(getCurrentRow(uiw), C_MAX_ROWS, C_ROWS_FETCHED));    
       } else {
         uiw._super();
